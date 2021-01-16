@@ -13,8 +13,8 @@ NUM_LINES = 3
 STOP_ID = "33000115"
 STOP_NAME = "Wasaplatz"
 MIN_TIME = 3
-TX_PORT = "/dev/ttyUSB_hub1"
-RX_PORT = "/dev/ttyUSB_hub2"
+TX_PORT = "/dev/ttyUSB1"
+RX_PORT = "/dev/ttyUSB0"
 ADDRESS = 2
 
 # Check if started as CGI script and if so return content type and enable HTML error output
@@ -167,9 +167,11 @@ def create_message():
 		b"\xdc": b"\x9a",		# Ü
 		b"\xdf": b"\xe1"		# ß
 	}
-	
+
+	"""
 	for i, j in charset.items():
 		message = message.replace(i, j)
+	"""
 		
 	#print(message.hex(' '))
 	return message
@@ -179,39 +181,29 @@ def send_message(msg):
 	send_address = str(ADDRESS).encode('latin-1')
 	rec_address = str(ADDRESS + 1).encode('latin-1')
 	
-	try:
+	#try:
 	
-		tx_channel = serial.Serial(
-			port = TX_PORT,
-			baudrate = 9600,
-			bytesize = serial.EIGHTBITS,
-			parity = serial.PARITY_EVEN,
-			stopbits = serial.STOPBITS_ONE
-			)
+	tx_channel = serial.Serial(port = TX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5)
 			
-		rx_channel = serial.Serial(
-			port = RX_PORT,
-			baudrate = 9600,
-			bytesize = serial.EIGHTBITS,
-			parity = serial.PARITY_EVEN,
-			stopbits = serial.STOPBITS_ONE
-			)
+	rx_channel = serial.Serial(port = RX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5)
 	
-	except:
-		print("Error opening serial ports")
-		return
+	#except:
+    		#print("Error opening serial ports")
+		#return
 	
 	rx_channel.flushInput()
 	tx_channel.write(b'\x04')   			# reset connection
+	tx_channel.write(b'\x04')
 	tx_channel.write(b'\x01' + rec_address + b'\x05')
 	
 	resp = rx_channel.read(2)				# reads two bytes from serial channel until it timeouts
 	if not resp == b'\x10\x30':    
 		print("Received no response from display.")
 		return
-		
+
+	rx_channel.flushInput()		
 	transmitted_bytes = tx_channel.write(msg)
-	
+		
 	resp = rx_channel.read(2)
 	if not resp == b'\x10\x31':
 		print("No acknowledge from display after successfully sending data")
@@ -219,6 +211,9 @@ def send_message(msg):
 		print("Data acknowledged by display")
 		
 	tx_channel.write(b'\x04')
+
+	tx_channel.close()
+	rx_channel.close()
 
 get_departures()
 msg = create_message()
