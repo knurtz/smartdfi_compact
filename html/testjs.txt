@@ -1,0 +1,19 @@
+function foo() {
+
+p1 = document.getElementById('p1')
+cont = document.getElementById('cont');
+p1.innerHTML = cont.childNodes.length;
+
+p2 = p1.cloneNode(true);
+p2.id = "p2";
+
+p1 = cont.appendChild(p2);
+
+}
+
+function bar() {
+
+cont = document.getElementById('cont');
+cont.removeChild(cont.childNodes[1]);
+
+}

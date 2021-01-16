@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <LINK rel="stylesheet" href="index.css" type="text/css" />
+  <script src="main.js"></script>
+  <title>smartDFI - Control Room</title>
+</head>
+
+<body>
+
+  <div id="main-box">
+
+    <div id="header-box">
+      <h3>smartDFI</h3>
+      <h1>Control Room</h1>
+    </div>
+
+    <div id="content-box">
+      <form id="display-form" action="cgi-bin/display-web-control.py" method="post">
+
+      <div id="panel-box">
+        <table id="panel-table" cellspacing="0">
+          <tr>
+            <th>Linie&nbsp;&nbsp;&nbsp;Ziel</td>
+            <th style="width: 100px; text-align: right;">in Min.</td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="text" class="input-left" id="line1-left" name="line1-left" value="1. Zeile" />
+              <input type="text" class="input-right" id="line1-right" name="line1-right" value="1. Zeile" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="text" class="input-left" id="line2-left" name="line2-left" value="2. Zeile" />
+              <input type="text" class="input-right" id="line2-right" name="line2-right" value="2. Zeile" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="text" class="input-left" id="line3-left" name="line3-left" value="3. Zeile" />
+              <input type="text" class="input-right" id="line3-right" name="line3-right" value="3. Zeile" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="text" class="input-left" id="line4-left" name="line4-left" value="4. Zeile" />
+              <input type="text" class="input-right" id="line4-right" name="line4-right" value="4. Zeile" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <input type="text" class="input-left" id="line5-left" name="line5-left" value="5. Zeile" />
+              <input type="text" class="input-right" id="line5-right" name="line5-right" value="5. Zeile" />
+            </td>
+          </tr>
+
+        </table><!-- end of text-table -->
+      </div><!-- end of panel-box -->
+
+      <div id="control-box">
+        <table id="control-table" cellspacing="0">
+
+          <tr>
+            <th>Schriftart</th>
+            <th>Ausrichtung</th>
+          </tr>
+
+          <tr>
+            <td>
+              <select size="1" id="line1-font" name="line1-font" onchange="updateFont('line1');">
+                <option value="P">Proportionalschrift</option>
+                <option value="B">Breitschrift</option>
+                <option value="S">Sperrsatz</option>
+                <option value="N">Blocksatz</option>
+              </select>
+            </td>
+            <td>
+              <select size="1" id="line1-align" name="line1-align" onchange="updateAlign('line1');">
+                <option value="L">Links</option>
+                <option value="M">Mitte</option>
+                <option value="R">Rechts</option>
+                <option value="X">Links / Rechts</option>
+              </select>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <select size="1" id="line2-font" name="line2-font" onchange="updateFont('line2');">
+                <option value="P">Proportionalschrift</option>
+                <option value="B">Breitschrift</option>
+                <option value="S">Sperrsatz</option>
+                <option value="N">Blocksatz</option>
+              </select>
+            </td>
+            <td>
+              <select size="1" id="line2-align" name="line2-align" onchange="updateAlign('line2');">
+                <option value="L">Links</option>
+                <option value="M">Mitte</option>
+                <option value="R">Rechts</option>
+                <option value="X">Links / Rechts</option>
+              </select>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <select size="1" id="line3-font" name="line3-font" onchange="updateFont('line3');">
+                <option value="P">Proportionalschrift</option>
+                <option value="B">Breitschrift</option>
+                <option value="S">Sperrsatz</option>
+                <option value="N">Blocksatz</option>
+              </select>
+            </td>
+            <td>
+              <select size="1" id="line3-align" name="line3-align" onchange="updateAlign('line3');">
+                <option value="L">Links</option>
+                <option value="M">Mitte</option>
+                <option value="R">Rechts</option>
+                <option value="X">Links / Rechts</option>
+              </select>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <select size="1" id="line4-font" name="line4-font" onchange="updateFont('line4');">
+                <option value="P">Proportionalschrift</option>
+                <option value="B">Breitschrift</option>
+                <option value="S">Sperrsatz</option>
+                <option value="N">Blocksatz</option>
+              </select>
+            </td>
+            <td>
+              <select size="1" id="line4-align" name="line4-align" onchange="updateAlign('line4');">
+                <option value="L">Links</option>
+                <option value="M">Mitte</option>
+                <option value="R">Rechts</option>
+                <option value="X">Links / Rechts</option>
+              </select>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <select size="1" id="line5-font" name="line5-font" onchange="updateFont('line5');">
+                <option value="P">Proportionalschrift</option>
+                <option value="B">Breitschrift</option>
+                <option value="S">Sperrsatz</option>
+                <option value="N">Blocksatz</option>
+              </select>
+            </td>
+            <td>
+              <select size="1" id="line5-align" name="line5-align" onchange="updateAlign('line5');">
+                <option value="L">Links</option>
+                <option value="M">Mitte</option>
+                <option value="R">Rechts</option>
+                <option value="X">Links / Rechts</option>
+              </select>
+            </td>
+          </tr>
+
+        </table><!-- end of control-table> -->
+      </div><!-- end of control-box -->
+
+      <div id="button-box">
+        <div id="reset-box">
+         <!-- <button type="reset">Alle Felder l&ouml;schen</button>-->
+        </div>
+        <div id="submit-box">
+          <button type="submit" value="submit">zum Display schicken</button>
+        </div>
+      </div>
+    </form><!-- end of display-form -->
+    </div> <!-- end of content-box -->
+
+    <div id="footer-box">
+      &copy;2017 - Johannes Herold - <a href="mailto:herold.johannes@gmail.com">herold.johannes@gmail.com</a>
+    </div>
+
+  </div><!-- end of main-box -->
+
+</body>
+</html>

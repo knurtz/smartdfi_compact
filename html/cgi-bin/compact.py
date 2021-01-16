@@ -1,0 +1,225 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
+import cgi
+import cgitb
+import os
+import requests
+import datetime
+import json
+import serial
+
+NUM_LINES = 3
+STOP_ID = "33000115"
+STOP_NAME = "Wasaplatz"
+MIN_TIME = 3
+TX_PORT = "/dev/ttyUSB_hub1"
+RX_PORT = "/dev/ttyUSB_hub2"
+ADDRESS = 2
+
+# Check if started as CGI script and if so return content type and enable HTML error output
+
+if 'REQUEST_METHOD' in os.environ:
+	cgitb.enable()
+	print("Content-Type: text/plain")    # HTML is following
+	print("Cache-Control: no-cache")
+	print()                             # blank line, end of headers
+	print("success")
+else:
+	#print("local execution")
+	pass
+
+# Create object to store the display text
+
+single_line = {
+	"text": "default",
+	"text2": " ",
+	"align": "L",       # "L" - left bound text, "R" - right bound text, "M" - center text, "D" - double text
+	"dynamic": "S",     # "S" - static text, "B" - switch text
+	"switch_time": 0
+	}
+    
+#print(single_line)	
+
+lines = []
+
+for i in range(0, NUM_LINES):
+	lines.append(single_line.copy())
+    
+#print(lines)
+
+# Fill text object with content. Different possiblities:
+# a) if executed as CGI script, try to get text from POST data
+# b) if started locally, get config from file (static config for now)
+
+# get stop info from VVO
+def get_departures():
+
+	payload = {"stopid": STOP_ID, "limit": 15}
+	try:
+		r = requests.post("http://webapi.vvo-online.de/dm?format=json", data = payload)
+	except:
+		lines[0]["text"] = "Server nicht erreichbar"
+		return
+
+	if r.status_code != 200:
+		lines[0]["text"] = "Server nicht erreichbar"
+		return
+
+	#print(r)
+
+	deps = {}
+	try:
+		deps = r.json()
+		deps = deps["Departures"]
+	except:
+		lines[0]["text"] = "Fehlerhafte Daten"
+
+	#print(deps)
+	
+	now = datetime.datetime.now()
+	current_line = 0
+	
+	# go through all departures
+	for d in deps:
+	
+		# check if departure time is supplied
+		if "RealTime" in d:
+			time_str = d["RealTime"]
+		elif "ScheduledTime" in d:
+			time_str = d["ScheduledTime"]
+		else:
+			continue
+		
+		# decode time field
+		try:
+			dep_time = datetime.datetime.fromtimestamp(int(time_str[6:-10]))
+		except:
+			continue
+			
+		# get time difference in minutes from now
+		diff_min = int((dep_time - now).total_seconds() / 60)
+		
+		# only show certain departures
+		if diff_min < MIN_TIME:
+			continue	# only display certain results
+		
+		# try to append new data to text. if it fails, some of the required fields were missing
+		try:
+			lines[current_line]["text"] = d["LineName"] + " " + d["Direction"]
+			lines[current_line]["text2"] = str(diff_min)
+			lines[current_line]["align"] = "D"
+		except:
+			continue		
+		
+		current_line += 1
+		if current_line >= NUM_LINES:
+			return
+			
+
+# send data to display
+def create_message():
+	
+	# start serial message as defined in protocol definition. message is a unicode string (type str)
+	message = "10" + 5 * "0" + "F"
+	
+	# add every line to the message. only static text for now.
+	for line, l	in enumerate(lines):
+		
+		# handle double text lines
+		# add one line on the left with text, add a second line on the right with text2 later
+		if l["align"] == "D":
+			l["align"] = "L"
+			double_text = True
+		else:
+			double_text = False
+		
+		# start segment 1, number of segments 3 as default
+		# "Proportional" font as default
+		# static text with dummy switch time of one second as defaul
+		message += "0" + str(line + 1) + "0103"	+  l["align"] + "P" + "S01" + l["text"] + "\x17"
+		
+		# for double text, do the whole thing again for the second part of the line (always right aligned)
+		if double_text:
+			message += "0" + str(line + 1) + "0103RPS01" + l["text2"] + "\x17"
+			
+	# end message with ETC character
+	message += "\x03"
+	
+	# convert message to latin-1 -> message is a bytestring now (type bytes)
+	message = message.encode('latin-1')
+		
+	# calculate checksum
+	checksum = 0
+	for char in message:
+		checksum ^= char
+		
+	# apply start byte now, since it is not included in checksum
+	message = b"\x02" + message + checksum.to_bytes(1, 'little')
+	
+	# some characters are defined differently from latin-1
+	charset = {
+		b"\xe4": b"\x84",		# ä
+		b"\xf6": b"\x94",		# ö
+		b"\xfc": b"\x81",		# ü
+		b"\xc4": b"\x8e",		# Ä
+		b"\xd6": b"\x99",		# Ö
+		b"\xdc": b"\x9a",		# Ü
+		b"\xdf": b"\xe1"		# ß
+	}
+	
+	for i, j in charset.items():
+		message = message.replace(i, j)
+		
+	#print(message.hex(' '))
+	return message
+	
+def send_message(msg):
+
+	send_address = str(ADDRESS).encode('latin-1')
+	rec_address = str(ADDRESS + 1).encode('latin-1')
+	
+	try:
+	
+		tx_channel = serial.Serial(
+			port = TX_PORT,
+			baudrate = 9600,
+			bytesize = serial.EIGHTBITS,
+			parity = serial.PARITY_EVEN,
+			stopbits = serial.STOPBITS_ONE
+			)
+			
+		rx_channel = serial.Serial(
+			port = RX_PORT,
+			baudrate = 9600,
+			bytesize = serial.EIGHTBITS,
+			parity = serial.PARITY_EVEN,
+			stopbits = serial.STOPBITS_ONE
+			)
+	
+	except:
+		print("Error opening serial ports")
+		return
+	
+	rx_channel.flushInput()
+	tx_channel.write(b'\x04')   			# reset connection
+	tx_channel.write(b'\x01' + rec_address + b'\x05')
+	
+	resp = rx_channel.read(2)				# reads two bytes from serial channel until it timeouts
+	if not resp == b'\x10\x30':    
+		print("Received no response from display.")
+		return
+		
+	transmitted_bytes = tx_channel.write(msg)
+	
+	resp = rx_channel.read(2)
+	if not resp == b'\x10\x31':
+		print("No acknowledge from display after successfully sending data")
+	else:
+		print("Data acknowledged by display")
+		
+	tx_channel.write(b'\x04')
+
+get_departures()
+msg = create_message()
+send_message(msg)
