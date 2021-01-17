@@ -21,10 +21,9 @@ ADDRESS = 2
 
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable()
-	print("Content-Type: text/plain")    # HTML is following
+	print("Content-Type: text/html")    # HTML is following
 	print("Cache-Control: no-cache")
 	print()                             # blank line, end of headers
-	print("success")
 else:
 	#print("local execution")
 	pass
@@ -148,15 +147,7 @@ def create_message():
 	
 	# convert message to latin-1 -> message is a bytestring now (type bytes)
 	message = message.encode('latin-1')
-		
-	# calculate checksum
-	checksum = 0
-	for char in message:
-		checksum ^= char
-		
-	# apply start byte now, since it is not included in checksum
-	message = b"\x02" + message + checksum.to_bytes(1, 'little')
-	
+
 	# some characters are defined differently from latin-1
 	charset = {
 		b"\xe4": b"\x84",		# ä
@@ -168,10 +159,16 @@ def create_message():
 		b"\xdf": b"\xe1"		# ß
 	}
 
-	"""
 	for i, j in charset.items():
-		message = message.replace(i, j)
-	"""
+		message = message.replace(i, j)	
+		
+	# calculate checksum
+	checksum = 0
+	for char in message:
+		checksum ^= char
+			
+	# apply start byte now, since it is not included in checksum
+	message = b"\x02" + message + checksum.to_bytes(1, 'little')
 		
 	#print(message.hex(' '))
 	return message
@@ -181,15 +178,13 @@ def send_message(msg):
 	send_address = str(ADDRESS).encode('latin-1')
 	rec_address = str(ADDRESS + 1).encode('latin-1')
 	
-	#try:
+	try:
+		tx_channel = serial.Serial(port = TX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5)
+		rx_channel = serial.Serial(port = RX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5)
 	
-	tx_channel = serial.Serial(port = TX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5)
-			
-	rx_channel = serial.Serial(port = RX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5)
-	
-	#except:
-    		#print("Error opening serial ports")
-		#return
+	except:
+		print("Error opening serial ports")
+		return
 	
 	rx_channel.flushInput()
 	tx_channel.write(b'\x04')   			# reset connection
