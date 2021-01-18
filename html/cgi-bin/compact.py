@@ -9,6 +9,7 @@ import datetime
 import json
 import serial
 
+
 NUM_LINES = 3
 STOP_ID = "33000115"
 STOP_NAME = "Wasaplatz"
@@ -17,8 +18,8 @@ TX_PORT = "/dev/ttyUSB1"
 RX_PORT = "/dev/ttyUSB0"
 ADDRESS = 2
 
-# Check if started as CGI script and if so return content type and enable HTML error output
 
+# Check if started as CGI script and if so return content type and enable HTML error output
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable()
 	print("Content-Type: text/html")    # HTML is following
@@ -28,8 +29,8 @@ else:
 	#print("local execution")
 	pass
 
-# Create object to store the display text
 
+# Create object to store the display text
 single_line = {
 	"text": "default",
 	"text2": " ",
@@ -37,19 +38,11 @@ single_line = {
 	"dynamic": "S",     # "S" - static text, "B" - switch text
 	"switch_time": 0
 	}
-    
-#print(single_line)	
-
+	
 lines = []
-
 for i in range(0, NUM_LINES):
 	lines.append(single_line.copy())
-    
-#print(lines)
 
-# Fill text object with content. Different possiblities:
-# a) if executed as CGI script, try to get text from POST data
-# b) if started locally, get config from file (static config for now)
 
 # get stop info from VVO
 def get_departures():
@@ -73,6 +66,7 @@ def get_departures():
 		deps = deps["Departures"]
 	except:
 		lines[0]["text"] = "Fehlerhafte Daten"
+		return
 
 	#print(deps)
 	
@@ -101,7 +95,7 @@ def get_departures():
 		
 		# only show certain departures
 		if diff_min < MIN_TIME:
-			continue	# only display certain results
+			continue
 		
 		# try to append new data to text. if it fails, some of the required fields were missing
 		try:
@@ -123,22 +117,22 @@ def create_message():
 	message = "10" + 5 * "0" + "F"
 	
 	# add every line to the message. only static text for now.
-	for line, l	in enumerate(lines):
+	for line, l in enumerate(lines):
 		
 		# handle double text lines
-		# add one line on the left with text, add a second line on the right with text2 later
+		# add one line (left aligned) with text, add a second line (right aligned) with text2 later
 		if l["align"] == "D":
 			l["align"] = "L"
 			double_text = True
 		else:
 			double_text = False
 		
-		# start segment 1, number of segments 3 as default
-		# "Proportional" font as default
-		# static text with dummy switch time of one second as defaul
-		message += "0" + str(line + 1) + "0103"	+  l["align"] + "P" + "S01" + l["text"] + "\x17"
+		# start at segment 1, number of segments 3 as default
+		# "proportional" font as default
+		# static text with dummy switch time of one second as default
+		message += "0" + str(line + 1) + "0103"	+  l["align"] + "PS01" + l["text"] + "\x17"
 		
-		# for double text, do the whole thing again for the second part of the line (always right aligned)
+		# for double text, do the whole thing again for the second part of the line (right aligned)
 		if double_text:
 			message += "0" + str(line + 1) + "0103RPS01" + l["text2"] + "\x17"
 			
@@ -146,7 +140,7 @@ def create_message():
 	message += "\x03"
 	
 	# convert message to latin-1 -> message is a bytestring now (type bytes)
-	message = message.encode('latin-1')
+	message = message.encode('latin-1', 'ignore')
 
 	# some characters are defined differently from latin-1
 	charset = {
@@ -158,7 +152,7 @@ def create_message():
 		b"\xdc": b"\x9a",		# Ü
 		b"\xdf": b"\xe1"		# ß
 	}
-
+	
 	for i, j in charset.items():
 		message = message.replace(i, j)	
 		
@@ -168,15 +162,16 @@ def create_message():
 		checksum ^= char
 			
 	# apply start byte now, since it is not included in checksum
-	message = b"\x02" + message + checksum.to_bytes(1, 'little')
+	message = b"\x02" + message + bytes([checksum])
 		
 	#print(message.hex(' '))
 	return message
 	
+
 def send_message(msg):
 
-	send_address = str(ADDRESS).encode('latin-1')
-	rec_address = str(ADDRESS + 1).encode('latin-1')
+	send_address = str(ADDRESS).encode('latin-1', 'ignore')
+	rec_address = str(ADDRESS + 1).encode('latin-1', 'ignore')
 	
 	try:
 		tx_channel = serial.Serial(port = TX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5)
@@ -197,7 +192,7 @@ def send_message(msg):
 		return
 
 	rx_channel.flushInput()		
-	transmitted_bytes = tx_channel.write(msg)
+	tx_channel.write(msg)
 		
 	resp = rx_channel.read(2)
 	if not resp == b'\x10\x31':
@@ -210,6 +205,6 @@ def send_message(msg):
 	tx_channel.close()
 	rx_channel.close()
 
+# main()
 get_departures()
-msg = create_message()
-send_message(msg)
+send_message(create_message())
