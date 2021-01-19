@@ -11,7 +11,7 @@ cd /var/www/html
 git reset --hard
 
 # store old revision hash
-$OLD=$(git rev-parse HEAD)
+OLD=$(git rev-parse HEAD)
 
 # fetch new version from server
 git pull --no-rebase
