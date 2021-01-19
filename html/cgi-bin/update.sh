@@ -5,7 +5,7 @@ echo "Content-Type: text/plain; charset=utf-8"
 echo ""
 
 # switch to repo directory
-#cd /var/www/html
+cd /var/www/html
 
 # discard all changes to avoid "you have unstaged changes" error
 git reset --hard > /dev/null
