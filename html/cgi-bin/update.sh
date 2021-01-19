@@ -6,20 +6,14 @@ echo ""
 echo "Aktualisiere..."
 
 # switch to repo directory
-if [ -z "$LOCAL_TEST" ]
-then
-	cd /var/www
-fi
+cd /var/www
 
 # log update to file
 echo "" >> ./html/cgi-bin/update-log.txt
 echo "Updating repo on $(date)" >> ./html/cgi-bin/update-log.txt
 
 # discard all changes to avoid "you have unstaged changes" error
-if [ -z "$LOCAL_TEST" ]
-then
-	git reset --hard > /dev/null 2>&1
-fi
+git reset --hard > /dev/null 2>&1
 
 # store old revision hash
 OLD_HASH=$(git rev-parse HEAD)
