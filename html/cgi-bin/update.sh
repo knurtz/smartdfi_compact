@@ -8,7 +8,7 @@ echo "Aktualisiere..."
 # switch to repo directory
 if [ -z "$LOCAL_TEST" ]
 then
-	cd /var/www/html
+	cd /var/www
 fi
 
 # log update to file
@@ -33,5 +33,5 @@ then
 	echo "Keine Änderungen gefunden."
 else
 	echo "Änderungen seit letztem Update:"
-git --no-pager log --pretty=format:'* %s' $OLD_HASH..
+	git --no-pager log --pretty=format:'* %s' $OLD_HASH..
 fi
