@@ -35,7 +35,7 @@ git fetch >> ./html/cgi-bin/update-log.txt 2>&1
 
 # go to requested version
 # if no specific revision is requested, this also cleans the working area for the upcoming pull command
-git reset --soft $VERSION >> ./html/cgi-bin/update-log.txt 2>&1
+git reset --hard $VERSION >> ./html/cgi-bin/update-log.txt 2>&1
 
 # if no specific revision is requested, just forward to newest revision with git pull
 if [[ "$VERSION" == "HEAD" ]]
@@ -47,6 +47,8 @@ NEW_HASH=$(git rev-parse --short HEAD)
 echo "New hash: $NEW_HASH" >> ./html/cgi-bin/update-log.txt 2>&1
 
 # display results
+echo "Softwarestand auf Version [$(git rev-parse --short HEAD)]."
+
 # check first possibility: no updates on server, same version as before
 if [[ "$OLD_HASH" == "$NEW_HASH" ]]
 then
@@ -55,13 +57,11 @@ then
 # second possibility: went back to older version
 elif [ $(git rev-list $OLD_HASH.. | wc -l) -eq 0 ]
 then
-	echo "Softwarestand jetzt auf Version [$(git rev-parse --short HEAD)]."
 	echo "Letzte Änderung:"
 	git --no-pager log --pretty=format:'* [%h] %s' HEAD^..
 
 # last possibility: updated to a newer version
 else
-	echo "Softwarestand jetzt auf Version [$(git rev-parse --short HEAD)]."
 	echo "Änderungen seit letztem Update:"
 	git --no-pager log --pretty=format:'* [%h] %s' $OLD_HASH..
 fi
