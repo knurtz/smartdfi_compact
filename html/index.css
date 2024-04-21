@@ -2,12 +2,13 @@ body {
   background-color: #444;
   font-family: Ubuntu, Verdana, sans-serif;
   padding: 20px;
+  text-align: center;
 }
 
 #main-box {
-  width: 1000px;
-  margin: auto;
-
+  margin: 0 auto;
+  display: inline-block;
+  
   padding: 20px;
 
   background-color: #fec400;
@@ -36,12 +37,16 @@ h3 {
 
 #content-box {
   padding: 20px 40px;
+  text-align: center;
 }
 
 #panel-box {
-  width: 566px;
-  float: left;
+  display: inline-block;
+  vertical-align: top;
+  
+  width: 600px;
   margin-right: 10px;
+  margin-bottom: 30px;
   padding: 15px;
 
   border: 2px solid black;
@@ -75,7 +80,7 @@ h3 {
 
 #panel-table td {
   padding: 0px 10px;
-  border-top: 15px solid #222;
+  border-top: 16px solid #222;
   border-left: 5px solid #222;
   border-right: 5px solid #222;
   height: 40px;
@@ -100,18 +105,18 @@ h3 {
 }
 
 #control-box {
-  float: left;
-  width: 310px;
-  padding: 15px 0px;
+  display: inline-block;
+  vertical-align: top;
+  
+  padding: 15px 0px;  
 }
 
 #control-table {
-  width: 100%;
 }
 
 #control-table th {
-  padding: 3px;
-  margin-bottom: 10px;
+  padding: 0 20px;
+  padding-bottom: 10px;
   height: 30px;
   border-bottom: 5px solid transparent;
 
@@ -122,30 +127,28 @@ h3 {
 }
 
 #control-table td {
-  padding: 0px 10px;
+  padding: 0px 20px 1px 20px;
   border-top: 15px solid transparent;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  height: 40px;
 
   text-align: center;
 }
 
-#button-box {
-  padding-top: 30px;
-  clear: both;
+#control-table td select {
+	padding: 10px;
 }
 
-#reset-box {
-  float: left;
+#control-table td button {
+	padding: 6px;
+	margin-top: 25px;
 }
 
-#submit-box {
-  float: right;
+#control-table td button[type=submit] {
+	font-weight: bold;
 }
 
 #footer-box {
-  margin-top: 30px;
   text-align: center;
   font-size: 0.8em;
 }

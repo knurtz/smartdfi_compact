@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-  <LINK rel="stylesheet" href="index.css" type="text/css" />
+  <link rel="stylesheet" href="index.css" type="text/css" />
+  <!--<link rel="stylesheet" href="form.css" type="text/css" />-->
   <script src="main.js"></script>
   <title>smartDFI - Control Room</title>
 </head>
@@ -163,19 +164,21 @@
               </select>
             </td>
           </tr>
+		  
+		  <tr>
+            <td>
+              <button type="reset" onclick="resetAll()">Alle Felder l&ouml;schen</button>
+            </td>
+            <td>
+              <button type="submit" value="submit">zum Display schicken</button>
+            </td>
+          </tr>
 
         </table><!-- end of control-table> -->
       </div><!-- end of control-box -->
 
-      <div id="button-box">
-        <div id="reset-box">
-         <!-- <button type="reset">Alle Felder l&ouml;schen</button>-->
-        </div>
-        <div id="submit-box">
-          <button type="submit" value="submit">zum Display schicken</button>
-        </div>
-      </div>
     </form><!-- end of display-form -->
+	
     </div> <!-- end of content-box -->
 
     <div id="footer-box">

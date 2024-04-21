@@ -44,8 +44,6 @@ for i in range(0,5):
 	pass	
 
 
-
-
 print "Content-type:text/plain\r\n"
 print "Success"
 print text_left

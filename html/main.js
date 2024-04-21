@@ -64,3 +64,12 @@ function updateAlign(line) {
   }
 
 }
+
+function resetAll() {	
+	['line1', 'line2', 'line3', 'line4', 'line5'].forEach( line => {		
+		hideSecondField(line);
+		document.getElementById(line+"-left").style.textAlign = "left";
+		document.getElementById(line+"-left").style.fontWeight = "normal";
+		document.getElementById(line+"-right").style.fontWeight = "normal";		
+	});	
+}

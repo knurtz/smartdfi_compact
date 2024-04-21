@@ -9,22 +9,26 @@ import datetime
 import json
 import serial
 
+from display import Display
 
-NUM_LINES = 3
+
+NUM_LINES = 5
 STOP_ID = "33000115"
 STOP_NAME = "Wasaplatz"
 MIN_TIME = 3
 TX_PORT = "/dev/ttyUSB1"
 RX_PORT = "/dev/ttyUSB0"
 ADDRESS = 2
+SWITCH_TIME = 5
+SWITCH_DEPS = True
 
 
 # Check if started as CGI script and if so return content type and enable HTML error output
 if 'REQUEST_METHOD' in os.environ:
-	cgitb.enable()
-	print("Content-Type: text/html")    # HTML is following
-	print("Cache-Control: no-cache")
-	print()                             # blank line, end of headers
+	cgitb.enable(format="text")
+	print("Content-Type: text/plain\r\n")    	# plain text is following
+	print("Cache-Control: no-cache\r\n")
+	print()                             		# blank line, end of headers
 else:
 	#print("local execution")
 	pass
@@ -32,16 +36,20 @@ else:
 
 # Create object to store the display text
 single_line = {
-	"text": "default",
+	"text": " ",
 	"text2": " ",
 	"align": "L",       # "L" - left bound text, "R" - right bound text, "M" - center text, "D" - double text
 	"dynamic": "S",     # "S" - static text, "B" - switch text
 	"switch_time": 0
-	}
+}
 	
 lines = []
 for i in range(0, NUM_LINES):
 	lines.append(single_line.copy())
+
+# second object for display content after switching
+if SWITCH_DEPS:
+	lines_switched = lines.copy()
 
 
 # get stop info from VVO
@@ -74,7 +82,10 @@ def get_departures():
 	current_line = 0
 	
 	# go through all departures
-	for d in deps:
+	while deps:
+		
+		# get first departure
+		d = deps.pop(0)
 	
 		# check if departure time is supplied
 		if "RealTime" in d:
@@ -107,8 +118,9 @@ def get_departures():
 		
 		current_line += 1
 		if current_line >= NUM_LINES:
-			return
-			
+			break
+		
+		
 
 # send data to display
 def create_message():
@@ -179,6 +191,8 @@ def send_message(msg):
 	
 	except:
 		print("Error opening serial ports")
+		print("Original message:")
+		print(msg.hex(' '))
 		return
 	
 	rx_channel.flushInput()
