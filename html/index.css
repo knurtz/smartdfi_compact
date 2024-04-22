@@ -26,13 +26,16 @@ body {
 }
 
 h1 {
-  margin: 0px;
+  margin: 10px;
   margin-bottom: 40px;
   font-size: 40px;
+  text-align: left;
 }
 
 h3 {
-  margin: 0px;
+  margin: 10px;
+  margin-bottom: 0px;
+  text-align: left;
 }
 
 #content-box {
@@ -45,7 +48,7 @@ h3 {
   vertical-align: top;
   
   width: 600px;
-  margin-right: 10px;
+  margin-right: 40px;
   margin-bottom: 30px;
   padding: 15px;
 
@@ -136,7 +139,13 @@ h3 {
 }
 
 #control-table td select {
-	padding: 10px;
+	border: 1px solid #444;
+	border-radius: 0.25em;
+	text-align: center;
+    cursor: pointer;
+	padding: 11px;
+	background-color: transparent;
+	background-image: linear-gradient(to top, #fec400, #cf9f00 95%);
 }
 
 #control-table td button {
