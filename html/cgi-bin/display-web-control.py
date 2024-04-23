@@ -38,15 +38,19 @@ form.getvalue('line3-align'),
 form.getvalue('line4-align'),
 form.getvalue('line5-align')
 ]
+    
+# Check if started as CGI script and if so return content type and enable HTML error output
+if 'REQUEST_METHOD' in os.environ:
+	cgitb.enable(format="text")
+	print("Content-Type: text/plain\r\n")    	# plain text is following
+	print("Cache-Control: no-cache\r\n")
+	print()                             		# blank line, end of headers
+else:
+	# local execution
+	pass
 
-for i in range(0,5):
-	
-	pass	
-
-
-print "Content-type:text/plain\r\n"
-print "Success"
-print text_left
-print text_right
-print font
-print align
+print("Success")
+print(text_left)
+print(text_right)
+print(font)
+print(align)
