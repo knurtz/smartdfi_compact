@@ -3,6 +3,7 @@ body {
   font-family: Ubuntu, Verdana, sans-serif;
   padding: 20px;
   text-align: center;
+  color: #111;
 }
 
 #main-box {
@@ -14,12 +15,12 @@ body {
   background-color: #fec400;
   background-image: url("images/smartDFI.png");
   background-repeat: no-repeat;
-  background-position: top right;
+  background-position: top 20px right 20px;
   background-size: 250px;
 
   border-radius: 5px;
 
-  box-shadow: 0px 8px 20px #222;
+  box-shadow: 0px 8px 10px #222;
 }
 
 #header-box {
@@ -28,6 +29,7 @@ body {
 h1 {
   margin: 10px;
   margin-bottom: 40px;
+  margin-top: 0px;
   font-size: 40px;
   text-align: left;
 }
@@ -36,6 +38,7 @@ h3 {
   margin: 10px;
   margin-bottom: 0px;
   text-align: left;
+  font-style: italic;
 }
 
 #content-box {
@@ -58,7 +61,7 @@ h3 {
   background-color: #222;
   color: #fff;
 
-  box-shadow: 0px 0px 40px #ffedb3;
+  box-shadow: 0px 0px 20px #ffedb3;
 }
 
 #panel-table {
@@ -75,7 +78,7 @@ h3 {
   height: 30px;
   border-bottom: 5px solid #222;
 
-  font-weight: bold;
+  /*font-weight: bold;*/
   text-align: left;
   font-size: 20px;
   letter-spacing: 1px;
@@ -123,7 +126,7 @@ h3 {
   height: 30px;
   border-bottom: 5px solid transparent;
 
-  font-weight: bold;
+  /*font-weight: bold;*/
   text-align: center;
   font-size: 20px;
   letter-spacing: 1px;
