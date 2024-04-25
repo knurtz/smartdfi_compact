@@ -44,7 +44,6 @@ form.getvalue('line5-align')
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable(format="text")
 	print("Content-Type: text/plain\r\n")    	# plain text is following
-	print("Cache-Control: no-cache\r\n")
 	print()                             		# blank line, end of headers
 else:
 	# local execution

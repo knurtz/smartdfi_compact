@@ -1,37 +1,29 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+# Check if started as CGI script and if so return content type and enable HTML error output
+import os
 import cgi
 import cgitb
-import os
+if 'REQUEST_METHOD' in os.environ:
+	cgitb.enable(format="text")
+	print("Content-Type: text/plain\r\n")    	# plain text is following
+    
 import requests
 import datetime
 import json
 import serial
 
-from display import Display
-
 
 NUM_LINES = 5
 STOP_ID = "33000115"
-STOP_NAME = "Wasaplatz"
-MIN_TIME = 3
+STOP_NAME = "Helmholtzstraße"
+MIN_TIME = 0
 TX_PORT = "/dev/ttyUSB1"
 RX_PORT = "/dev/ttyUSB0"
 ADDRESS = 2
 SWITCH_TIME = 5
-SWITCH_DEPS = True
-
-
-# Check if started as CGI script and if so return content type and enable HTML error output
-if 'REQUEST_METHOD' in os.environ:
-	cgitb.enable(format="text")
-	print("Content-Type: text/plain\r\n")    	# plain text is following
-	print("Cache-Control: no-cache\r\n")
-	print()                             		# blank line, end of headers
-else:
-	#print("local execution")
-	pass
+SWITCH_DEPS = False
 
 
 # Create object to store the display text
