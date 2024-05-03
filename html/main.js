@@ -57,7 +57,7 @@ function updateAlign(line) {
     document.getElementById(line+"-left").style.textAlign = "right";
     break;
 
-    case 'X':
+    case 'D':
     showSecondField(line);
     break;
 

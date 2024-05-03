@@ -5,7 +5,7 @@
 
 <head>
   <link rel="stylesheet" href="index.css" type="text/css" />
-  <!--<link rel="stylesheet" href="form.css" type="text/css" />-->
+  <meta charset="UTF-8" />
   <script src="main.js"></script>
   <title>smartDFI - Control Room</title>
 </head>
@@ -20,7 +20,7 @@
     </div>
 
     <div id="content-box">
-      <form id="display-form" action="cgi-bin/display-web-control.py" method="post">
+      <form id="display-form" action="cgi-bin/display-web-control.py" method="post" accept-charset="utf-8">
 
       <div id="panel-box">
         <table id="panel-table" cellspacing="0">
@@ -30,32 +30,32 @@
           </tr>
           <tr>
             <td colspan="2">
-              <input type="text" class="input-left" id="line1-left" name="line1-left" value="1. Zeile" />
-              <input type="text" class="input-right" id="line1-right" name="line1-right" value="1. Zeile" />
+              <input type="text" class="input-left" id="line1-left" name="line1-left" value="1. Zeile" onclick="this.select();" />
+              <input type="text" class="input-right" id="line1-right" name="line1-right" value="1. Zeile" onclick="this.select();" />
             </td>
           </tr>
           <tr>
             <td colspan="2">
-              <input type="text" class="input-left" id="line2-left" name="line2-left" value="2. Zeile" />
-              <input type="text" class="input-right" id="line2-right" name="line2-right" value="2. Zeile" />
+              <input type="text" class="input-left" id="line2-left" name="line2-left" value="2. Zeile" onclick="this.select();" />
+              <input type="text" class="input-right" id="line2-right" name="line2-right" value="2. Zeile" onclick="this.select();" />
             </td>
           </tr>
           <tr>
             <td colspan="2">
-              <input type="text" class="input-left" id="line3-left" name="line3-left" value="3. Zeile" />
-              <input type="text" class="input-right" id="line3-right" name="line3-right" value="3. Zeile" />
+              <input type="text" class="input-left" id="line3-left" name="line3-left" value="3. Zeile" onclick="this.select();" />
+              <input type="text" class="input-right" id="line3-right" name="line3-right" value="3. Zeile" onclick="this.select();" />
             </td>
           </tr>
           <tr>
             <td colspan="2">
-              <input type="text" class="input-left" id="line4-left" name="line4-left" value="4. Zeile" />
-              <input type="text" class="input-right" id="line4-right" name="line4-right" value="4. Zeile" />
+              <input type="text" class="input-left" id="line4-left" name="line4-left" value="4. Zeile" onclick="this.select();" />
+              <input type="text" class="input-right" id="line4-right" name="line4-right" value="4. Zeile" onclick="this.select();" />
             </td>
           </tr>
           <tr>
             <td colspan="2">
-              <input type="text" class="input-left" id="line5-left" name="line5-left" value="5. Zeile" />
-              <input type="text" class="input-right" id="line5-right" name="line5-right" value="5. Zeile" />
+              <input type="text" class="input-left" id="line5-left" name="line5-left" value="5. Zeile" onclick="this.select();" />
+              <input type="text" class="input-right" id="line5-right" name="line5-right" value="5. Zeile" onclick="this.select();" />
             </td>
           </tr>
 
