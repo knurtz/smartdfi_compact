@@ -12,10 +12,10 @@ import requests
 import datetime
 import json
 
-from compact import Display
+import compact
 
 NUM_LINES = 5
-STOP_ID = "33000115"
+STOP_ID = "33000742"
 STOP_NAME = "Helmholtzstraße"
 MIN_TIME = 0
 SWITCH_TIME = 5
@@ -26,7 +26,6 @@ SWITCH_DEPS = False
 def show_departures():
 
 	disp = compact.Display(NUM_LINES)
-
 
 	try:
 		r = requests.post("http://webapi.vvo-online.de/dm?format=json", data = {"stopid": STOP_ID, "limit": 15})
@@ -79,13 +78,21 @@ def show_departures():
 		# try to append new data to text. if it fails, some of the required fields were missing
 		try:
 			disp.lines[current_line]["text"] = d["LineName"] + " " + d["Direction"]
-			disp.lines[current_line]["text2"] = str(diff_min)
+			if diff_min != 0:
+				disp.lines[current_line]["text2"] = str(diff_min)
+			else:
+				disp.lines[current_line]["text2"] = " "
 			disp.lines[current_line]["align"] = "D"
 		except:
 			continue		
 		
 		current_line += 1
-		if current_line >= NUM_LINES:
+		if current_line >= NUM_LINES - 1:
 			break
 			
-		disp.create_and_send_message()
+	disp.lines[NUM_LINES - 1]["text"] = STOP_NAME
+	disp.lines[NUM_LINES - 1]["align"] = "M"
+			
+	disp.create_and_send_message()
+        
+show_departures()

@@ -6,14 +6,14 @@ import os, cgi, cgitb
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable(format="text")
 	print("Content-Type: text/plain\r\n")
-    
+	
 	
 import serial
 
 
 class Display:
 	
-	def __init__(self, num_lines = 5, tx_port = "/dev/ttyUSB1", rx_port = "/dev/ttyUSB0", address = 2):
+	def __init__(self, num_lines = 5, tx_port = "/dev/ttyUSB0", rx_port = "/dev/ttyUSB2", address = 10):
 	
 		self.NUM_LINES = num_lines
 		self.TX_PORT = tx_port
@@ -24,8 +24,9 @@ class Display:
 		single_line = {
 			"text": " ",
 			"text2": " ",
-			"align": "L",       # "L" - left bound text, "R" - right bound text, "M" - center text, "D" - double text
-			"dynamic": "S",     # "S" - static text, "B" - switch text
+			"font": "P",
+			"align": "L",	   	# "L" - left bound text, "R" - right bound text, "M" - center text, "D" - double text
+			"dynamic": "S",	 	# "S" - static text, "B" - switch text
 			"switch_time": 0
 		}
 	
@@ -37,7 +38,7 @@ class Display:
 		self.lines2 = self.lines.copy()
 	
 
-	def create_message():
+	def create_message(self):
 		
 		# start serial message as defined in protocol definition. message is a unicode string (type str)
 		message = "10" + 5 * "0" + "F"
@@ -56,11 +57,15 @@ class Display:
 			# start at segment 1, number of segments 3 as default
 			# "proportional" font as default
 			# static text with dummy switch time of one second as default
-			message += "0" + str(line + 1) + "0103"	+  l["align"] + "PS01" + l["text"] + "\x17"
+			if l["text"] == "":
+					l["text"] = " "
+			message += "0" + str(line + 1) + "0103"	+  l["align"] + l["font"] + "S01" + l["text"] + "\x17"
 			
 			# for double text, do the whole thing again for the second part of the line (right aligned)
 			if double_text:
-				message += "0" + str(line + 1) + "0103RPS01" + l["text2"] + "\x17"
+				if l["text2"] == "":
+					l["text2"] = " "
+				message += "0" + str(line + 1) + "0103R" + l["font"] + "S01" + l["text2"] + "\x17"
 				
 		# end message with ETC character
 		message += "\x03"
@@ -94,46 +99,47 @@ class Display:
 		return message
 	
 
-	def send_message(msg):
+	def send_message(self, msg):
 
 		send_address = str(self.ADDRESS).encode('latin-1', 'ignore')
 		rec_address = str(self.ADDRESS + 1).encode('latin-1', 'ignore')
 		
 		try:
-			with serial.Serial(port = self.TX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5) as tx_channel,
-				 serial.Serial(port = self.RX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 5) as rx_channel:
+			with (serial.Serial(port = self.TX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 1) as tx_channel,
+				  serial.Serial(port = self.RX_PORT, baudrate = 9600, bytesize = serial.EIGHTBITS, parity = serial.PARITY_EVEN, stopbits = serial.STOPBITS_ONE, timeout = 1) as rx_channel):
 		
-			rx_channel.flushInput()
-			
-			tx_channel.write(b'\x04')   			# reset connection
-			tx_channel.write(b'\x04')
-			tx_channel.write(b'\x01' + rec_address + b'\x05')
-			
-			resp = rx_channel.read(2)				# read two bytes from serial channel until it timeouts
-			
-			if not resp == b'\x10\x30':    
-				raise Exception("Received no response from display.")
+				rx_channel.flushInput()
+				
+				tx_channel.write(b'\x04')   			# reset connection
+				tx_channel.write(b'\x04')
+				tx_channel.write(b'\x01' + rec_address + b'\x05')
+				
+				resp = rx_channel.read(2)				# read two bytes from serial channel until it timeouts
+				
+				if not resp == b'\x10\x30':	
+					#raise Exception("Received no response from display.")
+					pass
 
-			rx_channel.flushInput()		
-			tx_channel.write(msg)
+				rx_channel.flushInput()		
+				tx_channel.write(msg)
+					
+				resp = rx_channel.read(2)
 				
-			resp = rx_channel.read(2)
-			
-			if not resp == b'\x10\x31':
-				raise Exception("No acknowledge from display after sending data")
-			else:
-				print("Success.\r\nData acknowledged by display")
+				if not resp == b'\x10\x31':
+					raise Exception("No acknowledge from display after sending data")
+				else:
+					print("Success.\r\nData acknowledged by display")
+					
+				tx_channel.write(b'\x04')
 				
-			tx_channel.write(b'\x04')
-			
-			return True
+				return True
 		
 		except Exception as err:
-			print("Error: " + err)
+			print("Error: ", err)
 			#print("Original message:")
 			#print(msg.hex(' '))
 			return False
 		
 		
-	def create_and_send_message():
-		send_message(create_message())
+	def create_and_send_message(self):
+		self.send_message(self.create_message())

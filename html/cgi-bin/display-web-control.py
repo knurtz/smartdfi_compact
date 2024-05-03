@@ -5,8 +5,12 @@ import os, cgi, cgitb
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable(format="text")
 	print("Content-Type: text/plain\r\n")    	# plain text is following
+	
+import compact
 
 form = cgi.FieldStorage() 
+
+disp = compact.Display(5)
 
 text_left = [
 	form.getvalue('line1-left'),
@@ -46,4 +50,11 @@ print(text_right)
 print(font)
 print(align)
 
-# todo: set fields accordingly
+for l in range(5):
+
+	disp.lines[l]["text"] = text_left[l]
+	disp.lines[l]["text2"] = text_right[l]
+	disp.lines[l]["font"] = font[l]
+	disp.lines[l]["align"] = align[l]
+
+disp.create_and_send_message()
