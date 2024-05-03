@@ -1,10 +1,11 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # Check if started as CGI script and if so return content type and enable HTML error output
 import os, cgi, cgitb
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable(format="text")
-	print("Content-Type: text/plain\r\n")    	# plain text is following
+	print("Content-Type: text/plain; charset=utf-8\r\n")    	# plain text is following
 	
 import compact
 
