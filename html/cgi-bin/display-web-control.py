@@ -6,7 +6,7 @@ import os, cgi, cgitb
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable(format="text")
 	print("Content-Type: text/plain; charset=utf-8\r\n")    	# plain text is following
-	
+
 import compact
 
 form = cgi.FieldStorage() 

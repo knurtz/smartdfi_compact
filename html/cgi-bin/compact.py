@@ -6,9 +6,10 @@ import os, cgi, cgitb
 if 'REQUEST_METHOD' in os.environ:
 	cgitb.enable(format="text")
 	print("Content-Type: text/plain\r\n")
-	
-	
+
+
 import serial
+import json
 
 
 class Display:
@@ -26,8 +27,8 @@ class Display:
 			"text2": " ",
 			"font": "P",
 			"align": "L",	   	# "L" - left bound text, "R" - right bound text, "M" - center text, "D" - double text
-			"dynamic": "S",	 	# "S" - static text, "B" - switch text
-			"switch_time": 0
+			#"dynamic": "S",	 	# "S" - static text, "B" - switch text
+			#"switch_time": 0
 		}
 	
 		self.lines = []
@@ -45,26 +46,22 @@ class Display:
 		
 		# add every line to the message. only static text for now.
 		for line, l in enumerate(self.lines):
-			
-			# handle double text lines
-			# add one line (left aligned) with text, add a second line (right aligned) with text2 later
-			if l["align"] == "D":
-				l["align"] = "L"
-				double_text = True
-			else:
-				double_text = False
-			
-			# start at segment 1, number of segments 3 as default
-			# "proportional" font as default
-			# static text with dummy switch time of one second as default
+		
 			if l["text"] == "":
 					l["text"] = " "
-			message += "0" + str(line + 1) + "0103"	+  l["align"] + l["font"] + "S01" + l["text"] + "\x17"
+					
+			if l["text2"] == "":
+					l["text2"] = " "
+			
+			# handle double text lines
+			double_text = (l["align"] == "D")
+			
+			# start at segment 1, number of segments 3 as default -> "0103"
+			# static text, switch time 1 second -> "S01"
+			message += "0" + str(line + 1) + "0103"	+ ("L" if double_text else l["align"]) + l["font"] + "S01" + l["text"] + "\x17"
 			
 			# for double text, do the whole thing again for the second part of the line (right aligned)
 			if double_text:
-				if l["text2"] == "":
-					l["text2"] = " "
 				message += "0" + str(line + 1) + "0103R" + l["font"] + "S01" + l["text2"] + "\x17"
 				
 		# end message with ETC character
@@ -83,6 +80,19 @@ class Display:
 			b"\xdc": b"\x9a",		# Ü
 			b"\xdf": b"\xe1"		# ß
 		}
+		
+		# add all special characters we find to our charset	
+		for x in range(len(message) - 2):
+			if message[x] == ord("\\"):		# detect backslash
+				#print("Found backslash at position %d" % x)
+				try:
+					hexcode = int(chr(message[x + 1]) + chr(message[x + 2]), base = 16)
+					#print("Decoded hex character %d" % hexcode)
+					charset[message[x:x + 3]] = bytes([hexcode])
+				except:
+					pass
+		
+		#print(charset)
 		
 		for i, j in charset.items():
 			message = message.replace(i, j)	
@@ -142,4 +152,8 @@ class Display:
 		
 		
 	def create_and_send_message(self):
-		self.send_message(self.create_message())
+		if self.send_message(self.create_message()):
+			s = json.dumps(self.lines, indent = 4, ensure_ascii = False)
+			with open("current_text.json", "w") as f:
+				print(s, file = f)
+		

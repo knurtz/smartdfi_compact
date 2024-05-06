@@ -18,9 +18,6 @@ NUM_LINES = 5
 STOP_ID = "33000742"
 STOP_NAME = "Helmholtzstraße"
 MIN_TIME = 0
-SWITCH_TIME = 5
-SWITCH_DEPS = False
-
 
 # get stop info from VVO
 def show_departures():
