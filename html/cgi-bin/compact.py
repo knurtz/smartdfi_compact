@@ -21,6 +21,12 @@ class Display:
 		self.RX_PORT = rx_port
 		self.ADDRESS = address
 
+		self.clear_lines()
+
+		# Second object for display content after switching
+		#self.lines2 = self.lines.copy()
+	
+	def clear_lines(self):
 		# Object to store display contents
 		single_line = {
 			"text": " ",
@@ -34,10 +40,7 @@ class Display:
 		self.lines = []
 		for i in range(0, self.NUM_LINES):
 			self.lines.append(single_line.copy())
-
-		# Second object for display content after switching
-		self.lines2 = self.lines.copy()
-	
+		
 
 	def create_message(self):
 		
@@ -140,8 +143,7 @@ class Display:
 				else:
 					print("Success.\r\nData acknowledged by display")
 					
-				tx_channel.write(b'\x04')
-				
+				tx_channel.write(b'\x04')				
 				return True
 		
 		except Exception as err:
