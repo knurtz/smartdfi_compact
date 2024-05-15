@@ -29,8 +29,8 @@ class Display:
 	def clear_lines(self):
 		# Object to store display contents
 		single_line = {
-			"text": " ",
-			"text2": " ",
+			"text": "",
+			"text2": "",
 			"font": "P",
 			"align": "L",	   	# "L" - left bound text, "R" - right bound text, "M" - center text, "D" - double text
 			#"dynamic": "S",	 	# "S" - static text, "B" - switch text
